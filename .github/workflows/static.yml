@@ -11,25 +11,29 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Arduino CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          # Додаємо URL для esp32, інакше core install не знайде пакет
           ./bin/arduino-cli config init
+          ./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com
           ./bin/arduino-cli core update-index
           ./bin/arduino-cli core install esp32:esp32
 
       - name: Compile firmware
         run: |
+          # Створюємо директорію вручну, щоб уникнути помилок шляху
+          mkdir -p build_output
           ./bin/arduino-cli compile \
             --fqbn esp32:esp32:esp32 \
-            --output-dir build \
+            --output-dir ./build_output \
             ./src
 
       - name: Upload compiled firmware
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware-bin
-          path: build/**/*.bin
-
+          # Використовуємо конкретний шлях до створеної папки
+          path: build_output/*.bin
