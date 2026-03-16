@@ -25,12 +25,14 @@ jobs:
       - name: Compile firmware
         run: |
           curl -fsSL https://raw.githubusercontent.com | sh
-          # Ініціалізуємо конфіг ОДРАЗУ з потрібною URL-адресою, 
-          # щоб уникнути появи порожніх значень
-          ./bin/arduino-cli config init --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json --overwrite
           
-          # Оновлюємо індекси (тепер URL вже в конфігу)
+          # 1. Повністю перезаписуємо конфіг з правильним URL (це прибере "Invalid URL")
+          ./bin/arduino-cli config init --additional-urls https://raw.githubusercontent.com --overwrite
+          
+          # 2. Оновлюємо індекси
           ./bin/arduino-cli core update-index
+          
+          # 3. Встановлюємо ядро
           ./bin/arduino-cli core install esp32:esp32
 
       - name: Upload compiled firmware
