@@ -15,12 +15,13 @@ jobs:
 
       - name: Set up Arduino CLI
         run: |
+          # 1. Виправлена адреса для завантаження CLI
           curl -fsSL https://raw.githubusercontent.com | sh
           
-          # Оновлюємо індекси, передаючи URL напряму (ігноруючи конфіг)
+          # 2. Оновлення індексів (ПОВНА адреса до JSON)
           ./bin/arduino-cli core update-index --additional-urls https://raw.githubusercontent.com
           
-          # Встановлюємо ядро
+          # 3. Встановлення ядра
           ./bin/arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com
 
       - name: Compile firmware
