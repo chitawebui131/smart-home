@@ -23,6 +23,3 @@ jobs:
             ./src
 
 
-
-ESP8266: esp8266:esp8266:nodemcuv2
-
