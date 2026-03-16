@@ -1,40 +1,28 @@
-name: Build ESP32 Firmware
+name: Arduino Build Check
 
 on:
   push:
-    branches: [ develop ]
   pull_request:
-  workflow_dispatch: 
+
 jobs:
-  build-esp32:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Arduino CLI
-        run: |
-          # 1. Виправлена адреса для завантаження CLI
-          curl -fsSL https://raw.githubusercontent.com | sh
-          
-          # 2. Оновлення індексів (ПОВНА адреса до JSON)
-          ./bin/arduino-cli core update-index --additional-urls https://raw.githubusercontent.com
-          
-          # 3. Встановлення ядра
-          ./bin/arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com
+      - name: Install Arduino CLI
+        uses: arduino/compile-sketches@v1
 
-      - name: Compile firmware
-        run: |
-          mkdir -p build_output
-          ./bin/arduino-cli compile \
-            --fqbn esp32:esp32:esp32 \
-            --output-dir ./build_output \
-            ./src \
-            --additional-urls https://raw.githubusercontent.com
-
-      - name: Upload compiled firmware
-        uses: actions/upload-artifact@v4
+      - name: Compile sketch for Arduino UNO
+        uses: arduino/compile-sketches@v1
         with:
-          name: esp32-firmware-bin
-          path: build_output/*.bin
+          fqbn: arduino:avr:uno
+          sketch-paths: |
+            ./src
+
+
+
+ESP8266: esp8266:esp8266:nodemcuv2
+
