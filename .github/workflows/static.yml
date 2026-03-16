@@ -15,29 +15,25 @@ jobs:
 
       - name: Set up Arduino CLI
         run: |
-          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-          # Додаємо URL для esp32, інакше core install не знайде пакет
-          ./bin/arduino-cli config init
-          ./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com
-          ./bin/arduino-cli core update-index
-          ./bin/arduino-cli core install esp32:esp32
+          curl -fsSL https://raw.githubusercontent.com | sh
+          
+          # Оновлюємо індекси, передаючи URL напряму (ігноруючи конфіг)
+          ./bin/arduino-cli core update-index --additional-urls https://raw.githubusercontent.com
+          
+          # Встановлюємо ядро
+          ./bin/arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com
 
       - name: Compile firmware
         run: |
-          curl -fsSL https://raw.githubusercontent.com | sh
-          
-          # 1. Повністю перезаписуємо конфіг з правильним URL (це прибере "Invalid URL")
-          ./bin/arduino-cli config init --additional-urls https://raw.githubusercontent.com --overwrite
-          
-          # 2. Оновлюємо індекси
-          ./bin/arduino-cli core update-index
-          
-          # 3. Встановлюємо ядро
-          ./bin/arduino-cli core install esp32:esp32
+          mkdir -p build_output
+          ./bin/arduino-cli compile \
+            --fqbn esp32:esp32:esp32 \
+            --output-dir ./build_output \
+            ./src \
+            --additional-urls https://raw.githubusercontent.com
 
       - name: Upload compiled firmware
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware-bin
-          # Використовуємо конкретний шлях до створеної папки
           path: build_output/*.bin
